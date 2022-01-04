@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div>
+      <h1>Pomodoro Timer</h1>
+    </div>
+    <div class="main">
+      <div class="parameters">
+        <h1 class="subtitle">Focused Work</h1>
+        <input type="number" id="workTime" name="workTime" min="0" value="25">
+        minutes
+        <h1 class="subtitle">Short Break</h1>
+        <input type="number" id="sBreak" name="sBreak" min="0" value="5">
+        minutes
+        <h1 class="subtitle">Long Break</h1>
+        <input type="number" id="lBreak" name="lBreak" min="0" value="15">
+        minutes
+        <h1 class="subtitle">Timer Sound</h1>
+        <select name="sounds" id="sounds">
+          <option value="digital">Digital Alarm</option>
+          <option value="bird">Bird</option>
+          <option value="kitchen">Kitchen</option>
+        </select>
+      </div>
+      <div id="timer" class="timer">
+        <p id="countdown"></p>
+      </div>
+      <audio id="sound" src="sounds/digital.mp3"></audio>
+    </div>
+    <button id="start" class="startTimer">Start Timer</button>
+    <script src="popup.js"></script>
+  </body>
+</html>

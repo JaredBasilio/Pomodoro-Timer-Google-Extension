@@ -1,0 +1,47 @@
+html {
+    min-height:300px;
+    min-width:350px;
+}
+
+.main {
+    display: flex;
+}
+
+body {
+    padding: 0 10px;
+}
+
+input {
+    width: 40px;
+    height: auto;
+}
+
+.subtitle {
+    font-size: 12px;
+}
+
+.parameters {
+    width: 50%;
+}
+
+.startTimer {
+    height: 30px;
+    width: auto;
+    outline: none;
+    margin: 10px;
+    border: none;
+    border-radius: 3px;
+    background:red;
+    color: white;
+    cursor: pointer;
+}
+
+.timer {
+    justify-content: center;
+    margin: auto;
+    vertical-align: middle;
+}
+
+.timer p {
+    font-size: 50px;
+}
