@@ -24,7 +24,7 @@ input {
     width: 50%;
 }
 
-.startTimer {
+.eventButton {
     height: 30px;
     width: auto;
     outline: none;
@@ -44,4 +44,8 @@ input {
 
 .timer p {
     font-size: 50px;
+}
+
+.buttons {
+    display: flex;
 }
