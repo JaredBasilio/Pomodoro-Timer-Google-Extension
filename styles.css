@@ -1,14 +1,24 @@
 html {
-    min-height:300px;
+    min-height:250px;
     min-width:350px;
+    background-color: rgb(233, 86, 86);
 }
 
 .main {
     display: flex;
+    font-family: 'Exo 2', sans-serif;
+    color: white;
 }
 
 body {
     padding: 0 10px;
+    height: 100%;
+}
+
+.title {
+    font-family: 'Exo 2', sans-serif;
+    text-align: center;
+    color: white;
 }
 
 input {
@@ -24,6 +34,13 @@ input {
     width: 50%;
 }
 
+
+.parameters input {
+    border-radius: 5px;
+    border: 0px solid rgb(190, 190, 190);
+    outline: 1px;
+}
+
 .eventButton {
     height: 30px;
     width: auto;
@@ -31,21 +48,49 @@ input {
     margin: 10px;
     border: none;
     border-radius: 3px;
-    background:red;
+    background-color: rgb(255, 79, 79);
+
     color: white;
     cursor: pointer;
+    font-family: 'Exo 2', sans-serif;
+    box-shadow: 0 3px rgb(146, 142, 142);
+    transition: transform 0.1s ease;
+}
+
+.eventButton:active {
+    box-shadow: 0 3px #666;
+    transform: translateY(4px);
 }
 
 .timer {
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.219);
+    position: relative;
+    width: 100%;
+
+    display: flex;
     justify-content: center;
-    margin: auto;
-    vertical-align: middle;
+    align-items: center;
 }
 
 .timer p {
     font-size: 50px;
+    margin: 15px;
+
+    text-align: center;
+    vertical-align: middle;
+}
+
+.timer h1 {
+    position: absolute;
+    top: -3%;
 }
 
 .buttons {
     display: flex;
+}
+
+.disabled {
+    pointer-events: none;
+    background:rgb(221, 221, 221);
 }

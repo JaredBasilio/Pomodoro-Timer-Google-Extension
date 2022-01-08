@@ -1,95 +1,124 @@
-let timerID;
+let timeout;
 let timerTime; //future time
 let timeLeft; //amount left
+let backgroundInterval;
 
 let numShort = 0;
 let partition = 0;
 
 let shortBreak;
 let longBreak;
-
-/**
- * 
-    clearInterval(interval);
-    interval = null;
-    startTime();
- */
+let workTime;
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.cmd === 'START_TIMER') {
-    timerTime = new Date(request.when); //date object for incoming time
-    shortBreak = request.short;
-    longBreak = request.long;
+  console.log(request.cmd);
+  if (request.cmd === 'START_TIMER') {//this should be called only once every session
+    timerTime = request.time * 60000; //work time in ms
+    timeLeft = timerTime;
 
-    console.log('started timer to end at: ' + timerTime);
-    timerID = setTimeout(() => {
-      //plays the sound
-      playSound();
+    //initializes the short break and long break timers, converts min to ms
+    workTime = request.time * 60000; //work time in ms
+    shortBreak = request.short * 60000;
+    longBreak = request.long * 60000;
 
-      //sends a message to popup that the timeout has ended
-      if (numShort < 4) {
-        partition = (partition + 1) % 2;
-      } else { //starts the long timer
-        numShort = 0;
-        partition = 2;
-      }
+    console.log('started timer: ' + msToTime(timerTime));
 
-    }, timerTime.getTime() - Date.now());
+    timer();
   } else if (request.cmd === 'GET_TIME') {
-    if (timerTime) {
-      console.log('Time Resumed: ' + msToTime(timerTime - Date.now()));
-    }
     sendResponse({ 
-      time: timerID ? timerTime : timeLeft + Date.now(),
-      running: timerID
+      //checks if timer is running, else return the temp timer left value
+      time: timeLeft,
+      running: timeout
     });
   } else if (request.cmd === 'END_TIMER') {
-    clearTimeout(timerID);
+
+    //resets everything
+    clearTimeout(timeout);
+    clearInterval(backgroundInterval);
+    timeout = null;
+    backgroundInterval = null;
     timeLeft = null;
     timerTime = null;
+    numShort = 0;
+    paritition = 0;
+    
     console.log("session ended")
   } else if (request.cmd === 'RUNNING') {
-    if (timerID) { //the timer is currently running
-      timeLeft = timerTime - Date.now()
-      timerID = null;
+    if (timeout) { //the timer is currently running
+      console.log("paused")
 
-      console.log(`session is running, paused with ${msToTime(timeLeft)} time left`)
+      //stops the timeout and interval
+      clearTimeout(timeout);
+      clearInterval(backgroundInterval);
+      timeout = null;
+      backgroundInterval = null;
+
+      timerTime = timeLeft;
 
       sendResponse({
         cmd: 'PAUSE',
         time: timeLeft
       });
     } else if (timeLeft) { //the timer is paused
-      timerID = setTimeout(() => { //restarts the timeout with the new ending time
-        playSound();
+      console.log("resumed");
 
-        if (numShort < 4) {
-          partition = (partition + 1) % 2;
-        } else { //starts the long timer
-          numShort = 0;
-          partition = 2;
-        }
-
-      }, timeLeft + Date.now());
+      timer();
 
       sendResponse({
         cmd: 'RESUME',
-        time: timeLeft + Date.now()
+        time: timeLeft
       });
-      
-      console.log(`session resumed with ${msToTime(timeLeft)}, new end time: ${msToTime(timeLeft + Date.now())}`);
-    } else { //there is no current session
-      console.log("session not running")
+    } else {
+      console.log('new')
+      sendResponse({
+        cmd: 'NEW',
+        time: timeLeft
+      });
     }
   }
 });
 
+//timer
+function timer() {
+  timeLeft = timerTime;
+  timeout = setTimeout(() => { //restarts the timeout with the new ending time
+    playSound();
+
+    //check what the session was, 0 = working, 1 = break
+    if (partition == 0) {
+      //start the short break timer
+      timerTime = shortBreak;
+      numShort++;
+      partition = 1;
+    } else { //partition = 1;
+      if (numShort == 4) {
+        //start a long timer
+        timerTime = longBreak;
+        numShort = 0;
+      } else {
+        //start work again
+        timerTime = workTime;
+        partition = 0;
+      }
+    }
+    timer();
+  }, timerTime);
+
+  backgroundInterval = setInterval(() => {
+    if (timeLeft >= 0) {
+      timeLeft -= 1000;
+    }
+    console.log(timeLeft);
+  }, 1000)
+}
+
+//plays the sound
 function playSound() {
   let url = chrome.runtime.getURL('audio.html');
 
   // set this string dynamically in your code, this is just an example
   // this will play success.wav at half the volume and close the popup after a second
-  url += '?volume=0.5&src=sounds/digital.mp3&length=1000';
+  url += '?volume=0.5&src=sounds/digital.mp3&length=3000';
 
   chrome.windows.create({
       type: 'popup',
